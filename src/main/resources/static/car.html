@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>购物车</title>
+    <link rel="stylesheet" type="text/css" href="css/common.css">
+    <link rel="stylesheet" href="css/register.css">
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+
+</head>
+<body style="background-color:#f7ec95;">
+<!--引入头部-->
+<div id="header"></div>
+<!-- 头部 end -->
+<div class="rg_layout">
+    <div class="rg_form clearfix" style="overflow-y: scroll">
+        <div class="rg_form_left">
+            <p>我的购物车</p>
+            <p>MY CAR</p>
+        </div>
+        <div class="rg_form_right">
+            <h2>总价 <label class="priceLable">&yen;</label></label><label id="totalPrice" class="priceLable">1221</label></h2>
+            <button class="btn btn-primary" onclick="toConfirm()">提交订单</button>
+        </div>
+        <br>
+        <div >
+            <div >
+                <table class="table table-striped table-bordered" id="carTable">
+                    <tr>
+                        <td>名称</td>
+                        <td width="15%">价格</td>
+                        <td>
+                            数量
+                        </td>
+                        <td width="10%">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>一加手机7T Pro(8+256GB)</td>
+                        <td>4599</td>
+                        <td>
+                            <input type="button" value='-' class="btn">
+                            <input name="text" type="text" value="1" style="width:40px;text-align:center" />
+                            <input type="button" value='+' class="btn">
+                        </td>
+                        <td width="10%">
+                            <input type="button" class="btn btn-danger" value="删除">
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function(){
+        loadCar();
+    });
+
+    function getNameById(pno) {
+        var pro;
+        $.ajax({
+            url:'product/findOne',
+            async : false,
+            type : "GET",
+            data:{pno:pno},
+            success : function (result){
+                pro=result;
+            }}
+        );
+        return pro;
+    };
+    function delectOne(pno) {
+        $.get("car/delectOne",{pno,pno},function(){
+            // alert("数量减一"+pno);
+            loadCar();
+        });
+
+    }
+    function addNums(pno) {
+        $.get("car/addCar",{pno,pno},function(){
+            // alert("数量减一"+pno);
+            loadCar();
+        });
+    }
+    function subNums(pno) {
+        $.get("car/subOne",{pno,pno},function(){
+           // alert("数量减一"+pno);
+            loadCar();
+        });
+    };
+    function loadCar(){
+        //第一步得到用户名
+        var username;
+        $.get('user/nowUser',function (data) {
+            username=data.username;
+            //alert(username);
+            //2.得到之后发送请求，获取购物车
+            if(username){
+                $.get('car/findAll',function(data){
+                    //alert(data);
+                    var totalPrice=0;
+                    var mytable='<tr>\n' +
+                        '                        <td>名称</td>\n' +
+                        '                        <td width="15%">价格</td>\n' +
+                        '                        <td>\n' +
+                        '                            数量\n' +
+                        '                        </td>\n' +
+                        '                        <td width="10%">\n' +
+                        '                        </td>\n' +
+                        '           </tr>';
+                    for(var i = 0; i < data.carObject.length; i++){
+                        var product = data.carObject[i];
+                        var reproduct=getNameById(product.pno);
+                        var pname=reproduct.pname;
+                        var pprice=reproduct.pprice;
+                        // alert("得到的产品名称"+pname);
+                        // alert("数量"+product.nums);
+                        var add='<tr>\n' +
+                            '                        <td>'+pname+'</td>\n' +
+                            '                        <td>'+pprice+'</td>\n' +
+                            '                        <td>\n' +
+                            '                            <input type="button" value=\'-\' class="btn" onclick="subNums('+product.pno+')">\n' +
+                            '                            <input name="text" type="text" value="'+product.nums+'" style="width:40px;text-align:center" />\n' +
+                            '                            <input type="button" value=\'+\' class="btn" onclick="addNums('+product.pno+')">\n' +
+                            '                        </td>\n' +
+                            '                        <td width="10%">\n' +
+                            '                            <input type="button" class="btn btn-danger" value="删除" onclick="delectOne('+product.pno+')">\n' +
+                            '                        </td>\n' +
+                            '                    </tr>';
+                        mytable+=add;
+                        totalPrice+=pprice*product.nums;
+                    }
+                    $("#carTable").html(mytable);
+                    //alert(totalPrice);
+                    $("#totalPrice").html(totalPrice);
+                })
+            }
+            else {
+                alert("请先登录");
+                location.href="login.html";
+            }
+        });
+    };
+    function toConfirm() {
+        var totalPrice=$("#totalPrice").html();
+        //alert(totalPrice);
+        if(totalPrice>0)
+            location.href='orderform.html';
+        else
+            alert("请先选择商品");
+    }
+</script>
+</body>
+</html>

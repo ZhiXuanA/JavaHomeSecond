@@ -1,0 +1,69 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>JS隐藏/显示</title>
+    <script type="text/javascript">
+        window.onload = function (){
+            var aDiv = document.getElementsByTagName("div");
+            var i = 0;
+
+            for (i = 0; i < aDiv.length; i++){
+                (function (){
+                    var oDiv = aDiv[i];
+                    var oH5 = oDiv.getElementsByTagName("h5")[0];
+                    var aP = oDiv.getElementsByTagName("p");
+                    var iHeight = oH5.offsetHeight + aP[0].offsetHeight * aP.length;
+                    var iLimitH = oH5.offsetHeight + aP[0].offsetHeight * 1;
+                    var bShow = false;
+                    if (aP.length > 3){
+                        oDiv.style.height = iLimitH + "px";
+                        oH5.innerHTML = "显示↓";
+                    }
+                    else{
+                        oH5.innerHTML = "隐藏↑"
+                    }
+                    oH5.onclick = function (){
+                        bShow = !bShow;
+                        doMove(oDiv, bShow ? iHeight : iLimitH);
+                        oH5.innerHTML = bShow ? "隐藏↑" : "显示↓"
+                    };
+                })()
+            }
+
+            function doMove(obj, iTarget, callback){
+                clearInterval(obj.timer);
+                obj.timer = setInterval(function (){
+                    var iSpeed = (iTarget - obj.offsetHeight) / 5;
+                    iSpeed = iSpeed > 0 ? Math.ceil(iSpeed)    : Math.floor(iSpeed);
+                    iTarget == obj.offsetHeight ? (clearInterval(obj.timer), callback && callback()) : obj.style.height = iSpeed + obj.offsetHeight + "px"
+                }, 30)
+            }
+        }
+    </script>
+    <style type="text/css">
+        div.xx{ width:500px;border:solid 1px;overflow:hidden;}
+        div p{margin:0;line-height:30px;}
+        div.xx h5{border:solid 1px;border-width:0 0 1px;padding:0;margin:0;height:30px;line-height:30px;cursor:pointer;background:#eee;}
+    </style>
+</head>
+<body>
+<button onclick="jsontest()"></button>
+<div class="xx"><h5>隐藏</h5>
+    <p>内容</p>
+    <p>内容</p>
+    <p>内容</p>
+    <p>内容</p>
+    <p>内容</p>
+    <p>内容</p>
+    <p>内容</p>
+    <p>内容</p>
+</div>
+</body>
+</html>
+<script>
+    function jsontest() {
+        var st="[{\"product\":{\"pno\":2,\"pname\":\"华为Mate30 Pro(8+128GB)\",\"pnote\":\"面部识别,拍照手机,全面屏,自拍神器,后置四摄,八核手机,渐变色机身,大屏手机,无线充电,大容量电池,快充手机,光学防抖,2.5D弧面屏,指纹识别,支持NFC,游戏手机\",\"pprice\":5799.0},\"num\":1},{\"product\":{\"pno\":3,\"pname\":\"魅族16T(6+128GB)\\r\\n\",\"pnote\":\"面部识别,拍照手机,全面屏,自拍神器,后置双摄,后置三摄,骁龙855,八核手机,渐变色机身,大屏手机,大容量电池,快充手机,2.5D弧面屏,指纹识别,游戏手机\",\"pprice\":1999.0},\"num\":1},{\"product\":{\"pno\":8,\"pname\":\"OPPO Reno Ace(8+128GB)\",\"pnote\":\"面部识别,拍照手机,全面屏,自拍神器,后置四摄,渐变色机身,大屏手机,大容量电池,快充手机,2.5D弧面屏,指纹识别,支持NFC,游戏手机\",\"pprice\":3199.0},\"num\":1},{\"product\":{\"pno\":26,\"pname\":\"新手机222\",\"pnote\":\"新手机222\",\"pprice\":222.0},\"num\":1}]";
+        ans=JSON.parse(st);
+        alert(ans.length);
+    }
+</script>

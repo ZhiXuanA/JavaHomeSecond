@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>登录成功</title>
+        <link rel="stylesheet" type="text/css" href="css/common.css">
+        <link rel="stylesheet" href="css/register.css">
+        <link rel="stylesheet" href="css/search.css">
+		<!--导入jquery-->
+        <script src="js/getParameter.js"></script>
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+        <script>
+            $.get('user/nowUser',function (data) {
+                //$("#userNamep").html(data.data);
+                $("#userNamep").html(data.name);
+            });
+        </script>
+        <script>
+            function search() {
+                var rname = $("#search_input").val();
+                if(rname){
+                //alert(rname);
+                // 跳转路径 http://localhost/travel/route_list.html?cid=5，拼接上rname=xxx
+                location.href="login_ok.html?pname="+rname;
+                }
+                else {
+                    location.href="login_ok.html";
+                }
+            }
+            //页面加载完成之后获取商品名
+            $(function(){
+                var pname = getParameter("pname");
+                //判断pname如果不为null或者""
+                if(pname){
+                    //url解码
+                    pname = window.decodeURIComponent(pname);
+                }
+                    load(null,pname)
+                }
+            );
+
+            function load(currentPage,pname) {
+
+                //alert(currentPage);
+                $.get('product/pageQuery',{pname:pname,currentPage:currentPage},function (data) {
+                    //alert(data);
+                    //1.设置页面选项
+                    $("#totalPage").html(data.totalPage);
+                    $("#totalCount").html(data.totalCount);
+                    var lis = "";
+
+                    var fristPage = '<li onclick="javascipt:load(1,'+pname+')"><a href="javascript:void(0)">首页</a></li>';
+
+                    //计算上一页的页码
+                    var beforeNum =  data.currentPage - 1;
+                    if(beforeNum <= 0){
+                        beforeNum = 1;
+                    }
+                    var beforePage = '<li  onclick="javascipt:load('+beforeNum+','+pname+')" class="threeword"><a href="javascript:void(0)">上一页</a></li>';
+                    lis += fristPage;
+                    lis += beforePage;
+
+                    // 定义开始位置begin,结束位置 end
+                    var begin; // 开始位置
+                    var end ; //  结束位置
+
+
+                    //1.要显示10个页码
+                    if(data.totalPage < 10){
+                        //总页码不够10页
+
+                        begin = 1;
+                        end = data.totalPage;
+                    }else{
+                        //总页码超过10页
+
+                        begin = data.currentPage - 5 ;
+                        end = data.currentPage + 4 ;
+
+                        //2.如果前边不够5个，后边补齐10个
+                        if(begin < 1){
+                            begin = 1;
+                            end = begin + 9;
+                        }
+
+                        //3.如果后边不足4个，前边补齐10个
+                        if(end > data.totalPage){
+                            end = data.totalPage;
+                            begin = end - 9 ;
+                        }
+                    }
+
+                    for (var i = begin; i <= end ; i++) {
+                        var li;
+                        //判断当前页码是否等于i
+                        if(data.currentPage == i){
+                            //alert(data.currentPage);
+                           // alert(data.currentPage== i);
+                            li = '<li class="curPage" onclick="javascipt:load('+i+',\''+pname+'\')"><a href="javascript:void(0)">'+i+'</a></li>';
+
+                        }else{
+                            //创建页码的li
+                            li = '<li onclick="javascipt:load('+i+',\''+pname+'\')"><a href="javascript:void(0)">'+i+'</a></li>';
+                        }
+                        //拼接字符串
+                        lis += li;
+                    }
+
+
+                    var lastPage = '<li class="threeword" onclick="javascipt:load('+data.totalPage+','+pname+')"><a href="javascript:;">末页</a></li>';
+                    var nextNum =  data.currentPage + 1;
+                    if(nextNum >=data.totalPage ){
+                        nextNum =data.totalPage;
+                    }
+                    var nextPage = '<li class="threeword" onclick="javascipt:load('+nextNum+','+pname+')"><a href="javascript:;">下一页</a></li>';
+
+                    lis += nextPage;
+                    lis += lastPage;
+                    $("#pageNum").html(lis);
+
+                    //2.设置页面内容
+                    /*
+                        <li>
+                            <div class="img"><img src="" alt="暂无图片"></div>
+                            <div class="text1">
+                                <p>商品名称</p>
+                                <br/>
+                                <p>商品简介</p>
+                            </div>
+                            <div class="price">
+                                <p class="price_num">
+                                    <span>&yen;</span>
+                                    <span>299</span>
+                                    <span>起</span>
+                                </p>
+                                <p><a href="route_detail.html">查看详情</a></p>
+                            </div>
+                        </li>
+                        <hr>
+                      */
+                    var pro_lis = "";
+
+                    for (var i = 0; i < data.list.length; i++){
+                        var product = data.list[i];
+                        var li=' <li>\n' +
+                            '                            <div class="img"><img style="height:100%;\n' +
+                            '\twidth:auto;" src="proImg/p'+product.pno+'.jpg" alt="暂无图片"></div>\n' +
+                            '                            <div class="text1">\n' +
+                            '                                <p>'+product.pname+'</p>\n' +
+                            '                                <br/>\n' +
+                            '                                <p>'+product.pnote+'</p>\n' +
+                            '                            </div>\n' +
+                            '                            <div class="price">\n' +
+                            '                                <p class="price_num">\n' +
+                            '                                    <span>&yen;</span>\n' +
+                            '                                    <span>'+product.pprice+'</span>\n' +
+                            '                                    <span>起</span>\n' +
+                            '                                </p>\n' +
+                            '                                <p><a href="product_detail.html?pno='+product.pno+'">查看详情</a></p>\n' +
+                            '                            </div>\n' +
+                            '                        </li>\n' +
+                            '                        <hr>';
+                        //alert(li);
+                        pro_lis+=li;
+
+                    }
+                    $("#route").html(pro_lis);
+
+                });
+            }
+        </script>
+    </head>
+    <body style="background-color: #f7ec95">
+        <div class="shortcut">
+            <!-- 登录状态  -->
+            <div class="header_wrap" style="float: left">
+                <div class="topbar">
+
+                    <div class="search">
+                        <input name="" id="search_input"  type="text" placeholder="请输入产品名称" class="search_input" autocomplete="off">
+                        <a href="javascript:search();" id="search-button" class="search-button">搜索</a>
+                        <div class="login" >
+                            <a href="car.html" class="collection">我的购物车</a>
+                            <a href="user/logout">退出</a>
+                        </div>
+                    </div>
+                    <p style="margin: 15px">欢迎您,&nbsp&nbsp<span id="userNamep">---</span></p>
+
+                </div>
+            </div>
+        </div>
+
+    <div class="navitem">
+        <ul id="category" class="nav">
+        </ul>
+    </div>
+
+
+    <div class="page_one" style="background-color: #f9f2f4">
+        <div class="contant">
+            <div class="crumbs">
+                <img src="images/search.png" alt="">
+                <p>商品><span>搜索结果</span></p>
+            </div>
+            <p id="testShow">这里显示结果</p>
+            <div class="xinxi clearfix">
+                <div class="left">
+                    <div class="header">
+                        <span>商品信息</span>
+                        <span class="jg">价格</span>
+                    </div>
+                    <ul id="route">
+
+                        <li>
+                            <div class="img"><img src="" alt="暂无图片"></div>
+                            <div class="text1">
+                                <p>商品名称</p>
+                                <br/>
+                                <p>商品简介</p>
+                            </div>
+                            <div class="price">
+                                <p class="price_num">
+                                    <span>&yen;</span>
+                                    <span>299</span>
+                                    <span>起</span>
+                                </p>
+                                <p><a href="route_detail.html">查看详情</a></p>
+                            </div>
+                        </li>
+                        <hr>
+
+                        <li>
+                            <div class="img"><img src="" alt="暂无图片"></div>
+                            <div class="text1">
+                                <p>商品名称</p>
+                                <br/>
+                                <p>商品简介</p>
+                            </div>
+                            <div class="price">
+                                <p class="price_num">
+                                    <span>&yen;</span>
+                                    <span>299</span>
+                                    <span>起</span>
+                                </p>
+                                <p><a href="route_detail.html">查看详情</a></p>
+                            </div>
+                        </li>
+                        <hr>
+
+
+                        <li>
+                            <div class="img"><img src="proImg/p3.jpg" alt="暂无图片"></div>
+                            <div class="text1">
+                                <p>商品名称</p>
+                                <br/>
+                                <p>商品简介</p>
+                            </div>
+                            <div class="price">
+                                <p class="price_num">
+                                    <span>&yen;</span>
+                                    <span>299</span>
+                                    <span>起</span>
+                                </p>
+                                <p><a href="">查看详情</a></p>
+                            </div>
+                        </li>
+                        <hr>
+
+
+                        <li>
+                            <div class="img"><img src="" alt="暂无图片"></div>
+                            <div class="text1">
+                                <p>商品名称</p>
+                                <br/>
+                                <p>商品简介</p>
+                            </div>
+                            <div class="price">
+                                <p class="price_num">
+                                    <span>&yen;</span>
+                                    <span>299</span>
+                                    <span>起</span>
+                                </p>
+                                <p><a href="route_detail.html">查看详情</a></p>
+                            </div>
+                        </li>
+                        <hr>
+
+
+                        <li>
+                            <div class="img"><img src="" alt="暂无图片"></div>
+                            <div class="text1">
+                                <p>商品名称</p>
+                                <br/>
+                                <p>商品简介</p>
+                            </div>
+                            <div class="price">
+                                <p class="price_num">
+                                    <span>&yen;</span>
+                                    <span>299</span>
+                                    <span>起</span>
+                                </p>
+                                <p><a href="route_detail.html">查看详情</a></p>
+                            </div>
+                        </li>
+                        <hr>
+
+
+                        <li>
+                            <div class="img"><img src="" alt="暂无图片"></div>
+                            <div class="text1">
+                                <p>商品名称</p>
+                                <br/>
+                                <p>商品简介</p>
+                            </div>
+                            <div class="price">
+                                <p class="price_num">
+                                    <span>&yen;</span>
+                                    <span>299</span>
+                                    <span>起</span>
+                                </p>
+                                <p><a href="route_detail.html">查看详情</a></p>
+                            </div>
+                        </li>
+                        <hr>
+
+
+                        <li>
+                            <div class="img"><img src="" alt="暂无图片"></div>
+                            <div class="text1">
+                                <p>商品名称</p>
+                                <br/>
+                                <p>商品简介</p>
+                            </div>
+                            <div class="price">
+                                <p class="price_num">
+                                    <span>&yen;</span>
+                                    <span>299</span>
+                                    <span>起</span>
+                                </p>
+                                <p><a href="route_detail.html">查看详情</a></p>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="page_num_inf">
+                        <i></i> 共
+                        <span id="totalPage">12</span>页<span id="totalCount">132</span>条
+                    </div>
+                    <div class="pageNum">
+                        <ul id="pageNum">
+                            <li><a href="">首页</a></li>
+                            <li class="threeword"><a href="#">上一页</a></li>
+                            <li class="curPage"><a href="#">1</a></li>
+                            <li><a href="#">2</a></li>
+                            <li><a href="#">3</a></li>
+                            <li><a href="#">4</a></li>
+                            <li><a href="#">5</a></li>
+                            <li><a href="#">6</a></li>
+                            <li><a href="#">7</a></li>
+                            <li><a href="#">8</a></li>
+                            <li><a href="#">9</a></li>
+                            <li><a href="#">10</a></li>
+                            <li class="threeword"><a href="javascript:;">下一页</a></li>
+                            <li class="threeword"><a href="javascript:;">末页</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <div id="footer"></div>
+    </body>
+</html>

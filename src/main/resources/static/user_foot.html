@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>用户足迹</title>
+    <link rel="stylesheet" type="text/css" href="css/common.css">
+    <link rel="stylesheet" href="css/register.css">
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+
+</head>
+<body style="background-color:#f7ec95;">
+<!--引入头部-->
+<div id="header"></div>
+<!-- 头部 end -->
+<div class="rg_layout">
+    <div class="rg_form clearfix" style="overflow-y: scroll">
+        <div class="rg_form_left">
+            <p>查看用户足迹</p>
+            <p>USER FOOT</p>
+        </div>
+
+        <br>
+        <div >
+            <div class="rg_form_right">
+                <p>
+                    <a href="uploadpic.html">添加商品</a>
+                </p>
+                <p>
+                    <a href="product_order.html">查看订单</a>
+                </p>
+            </div>
+            <div >
+                <table class="table table-striped table-bordered" id="carTable">
+                    <tr>
+                        <td>用户名</td>
+                        <td width="20%">产品编号</td>
+                        <td width="20%">浏览时间</td>
+                    </tr>
+
+                    <tr>
+                        <td>12345678</td>
+                        <td width="20%">
+                        <a href="product_detail.html?pno=12">12</a>
+                        </td>
+                        <td width="20%">
+                            20
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>12345678</td>
+                        <td width="20%">
+                            <a href="product_detail.html?pno=12">12</a>
+                        </td>
+                        <td width="20%">
+                            20
+                        </td>
+                    </tr>
+
+
+
+
+
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+<script>
+    function to_hide(num) {
+        var tbname = "tb" + num;
+        //alert(tbname);
+        $("#" + tbname).toggle();
+        //alert($("#"+tbname));
+    };
+    $(function(){
+        $.post("foot/findAll",{},function(data) {
+            console.log(data);
+            tableToal="";
+            firstTableHead='<tbody><tr>\n' +
+                '                        <td>用户名</td>\n' +
+                '                        <td width="20%">产品编号</td>\n' +
+                '                        <td width="20%">浏览时间</td>\n' +
+                '                    </tr>';
+            tableToal+=firstTableHead;
+            for(var i=0;i<data.length;i++){
+                temp=data[i];
+                item='<tr>\n' +
+                    '                        <td>'+temp.uname+'</td>\n' +
+                    '                        <td width="20%">\n' +
+                    '                        <a href="product_detail.html?pno='+temp.pno+'">'+temp.pno+'</a>\n' +
+                    '                        </td>\n' +
+                    '                        <td width="20%">\n' +
+                    '                            '+temp.time+'\n' +
+                    '                        </td>\n' +
+                    '                    </tr>';
+                tableToal+=item;
+            }
+            tableToal+="<tobdy>";
+            $("#carTable").html(tableToal);
+            })
+    })
+</script>

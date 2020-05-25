@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>查看订单</title>
+    <link rel="stylesheet" type="text/css" href="css/common.css">
+    <link rel="stylesheet" href="css/register.css">
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+
+</head>
+<body style="background-color:#f7ec95;">
+<!--引入头部-->
+<div id="header"></div>
+<!-- 头部 end -->
+<div class="rg_layout">
+    <div class="rg_form clearfix" style="overflow-y: scroll">
+        <div class="rg_form_left">
+            <p>查看订单</p>
+            <p>ORDER MANAGER</p>
+        </div>
+
+        <br>
+        <div >
+            <div class="rg_form_right">
+                <p>
+                    <a href="uploadpic.html">添加商品</a>
+                </p>
+                <p>
+                    <a href="user_foot.html">查看用户足迹</a>
+                </p>
+            </div>
+            <div >
+                <table class="table table-striped table-bordered" id="carTable">
+                    <tr>
+                        <td>用户名</td>
+                        <td>邮箱</td>
+                        <td width="15%">地址</td>
+                        <td>日期</td>
+                        <td>总价格</td>
+                        <td width="20%">操作</td>
+                    </tr>
+                    <tr>
+                        <td>12345678</td>
+                        <td>www416277970@qq.com</td>
+                        <td>广东省广州市</td>
+                        <td>2019-10-1</td>
+                        <td>1000</td>
+                        <td width="10%">
+                            <input type="button" class="btn btn-primary" onclick="to_hide(1)" value="查看详情">
+                        </td>
+                    </tr>
+                    <tr >
+                        <td></td>
+                        <td colspan="4">
+                            <table class="table table-bordered" id="tb1" hidden="hidden">
+                                <tr>
+                                    <td>产品名称</td>
+                                    <td>数量</td>
+                                </tr>
+                                <tr>
+                                    <td>新手机</td>
+                                    <td>30</td>
+
+                                </tr>
+                                <tr>
+                                    <td>新手机</td>
+                                    <td>30</td>
+
+                                </tr>
+                            </table>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>12345678</td>
+                        <td>www416277970@qq.com</td>
+                        <td>广东省广州市</td>
+                        <td>2019-10-11</td>
+                        <td>1000</td>
+                        <td width="10%">
+                            <input type="button" class="btn btn-primary" onclick="to_hide(2)" value="查看详情">
+                        </td>
+                    </tr>
+                    <tr >
+                        <td></td>
+                        <td colspan="4">
+                            <table class="table table-bordered" id="tb2" hidden="hidden">
+                                <tr>
+                                    <td>产品名称</td>
+                                    <td>数量</td>
+                                </tr>
+                                <tr>
+                                    <td>新手机</td>
+                                    <td>30</td>
+
+                                </tr>
+                                <tr>
+                                    <td>新手机</td>
+                                    <td>30</td>
+
+                                </tr>
+                            </table>
+                        </td>
+                        <td></td>
+                    </tr>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    $(function () {
+       $.post("car/findAllOrder",function(data){
+           tableToal="";
+           firstTableHead=' <tbody><tr>\n' +
+               '                        <td>用户名</td>\n' +
+               '                        <td>邮箱</td>\n' +
+               '                        <td width="15%">地址</td>\n' +
+               '                        <td>日期</td>\n' +
+               '                        <td>总价格</td>\n' +
+               '                        <td width="20%">操作</td>\n' +
+               '                    </tr>';
+           tableToal+=firstTableHead;
+           for(var i=0;i<data.length;i++){
+               item='<tr>\n' +
+                   '                        <td>'+data[i].uname+'</td>\n' +
+                   '                        <td>'+data[i].uemail+'</td>\n' +
+                   '                        <td>'+data[i].addre+'</td>\n' +
+                   '                        <td>'+data[i].date+'</td>\n' +
+                       '                        <td>'+data[i].sum+'</td>\n' +
+                       '                        <td width="10%">\n' +
+                       '                            <input type="button" class="btn btn-primary" onclick="to_hide('+(i+1)+')" value="查看详情">\n' +
+                       '                        </td>\n' +
+                       '                    </tr>\n' +
+                       '                    <tr >\n' +
+                       '                        <td></td>\n' +
+                       '                        <td colspan="4">\n' +
+                       '                            <table class="table table-bordered" id="tb'+(i+1)+'" hidden="hidden">\n' +
+                       '                                <tbody><tr>\n' +
+                       '                                    <td>产品名称</td>\n' +
+                       '                                    <td>数量</td>\n' +
+                       '                                </tr>\n' ;
+
+               var car=JSON.parse(data[i].car);
+              //alert(car.length)
+               for(var j=0;j<car.length;j++)
+               {
+                   item+='<tr>\n' +
+                       '                                    <td>'+car[j].product.pname+'</td>\n' +
+                       '                                    <td>'+car[j].num+'</td>\n' +
+                       '\n' +
+                       '                                </tr>'
+               }
+
+               seondEnd='                            </tbody></table>\n' +
+                       '                        </td>\n' +
+                       '                        <td></td>\n' +
+                       '                    </tr>';
+                    item+=seondEnd;
+                    tableToal+=item;
+           }
+           tableToal+="</tbody>"
+           $("#carTable").html(tableToal);
+       })
+    });
+    function to_hide(num) {
+        var tbname="tb"+num;
+        //alert(tbname);
+        $("#"+tbname).toggle();
+        //alert($("#"+tbname));
+    }
+</script>
